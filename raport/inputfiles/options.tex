@@ -1,0 +1,114 @@
+
+% Ustawienia biblatexa
+% Brak przecinka po nazwisku autora w bibliografii
+\renewcommand*{\revsdnamepunct}{}
+
+% Kolejność: Nazwisko -> Imie przy wymienianiu autorów
+\DeclareNameAlias{sortname}{family-given}
+
+% Zamiana 'and' pomiędzy imionami autorów na 'i'
+% Na końcu dokumentu zmiana na 'finalnamedelim' na ',' !!!
+\DeclareDelimFormat{finalnamedelim}{\addspace i\addspace}
+
+% Przecinek po ostatnim autorze
+\renewcommand*{\nametitledelim}{\addcomma\addspace}
+
+% Zmiana pp. na s.
+\DeclareFieldFormat{pages}{s\adddot\addspace #1} % 's. ' w bibliografii
+\DeclareFieldFormat{postnote}{s\adddot\addspace #1}
+\DeclareFieldFormat{multipostnote}{s\adddot\addspace #1}
+
+% Dodanie w \parentcite przecinek miedzy rokiem a autorem/autorami
+\renewcommand*{\nameyeardelim}{\addcomma\addspace}
+
+% Dodane odstępu pomiędzy elementami bibliografii
+%\setlength\bibitemsep{2\itemsep}
+\setlength\bibitemsep{2\itemsep}
+
+% Usunięcie "In: Journal" w bibliografii
+\renewbibmacro{in:}{}
+
+% Dodanie Vol. numer, No numer, w bibliografii
+\DeclareFieldFormat[article]{volume}{Vol. \addnbspace #1}
+\DeclareFieldFormat[article]{number}{No\addnbspace #1}
+\renewbibmacro*{volume+number+eid}{
+    \printfield{volume}
+    \setunit{\addcomma\space}
+    \printfield{number}
+    \setunit{\addcomma\space}
+    \printfield{eid}
+    \setunit{\addcomma\space}
+}
+
+% Przecinek po nazwie czasopisma naukowego
+\DeclareFieldFormat{journaltitle}{\mkbibemph{#1}\isdot}
+\renewbibmacro*{journal+issuetitle}{
+    \usebibmacro{journal}
+    \setunit*{\addcomma\space}
+    \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}
+     \setunit{\addspace}}
+    \usebibmacro{volume+number+eid}
+    \setunit{\addspace}
+    \usebibmacro{issue+date}
+    \setunit{\addcolon\space}
+    \usebibmacro{issue}
+    \newunit}    
+
+% Brak nawiasów w roku wydania
+\renewbibmacro*{issue+date}{
+    \setunit{\addcomma\space}
+    \iffieldundef{issue}
+    {\usebibmacro{date}}
+    {\printfield{issue}
+     \setunit*{\addspace}
+     \usebibmacro{date}}
+\newunit}
+
+% Usunięcie italizacji w bibliografii
+\makeatletter
+\renewrobustcmd*{\mkbibemph}{}
+\protected\long\def\blx@imc@mkbibemph#1{#1}
+\makeatother
+
+% Usunięcie cudzysłowów
+\DeclareFieldFormat*{title}{#1}
+
+% Wielkość wcięcia w bibliografii
+\setlength\bibhang{1cm}
+
+% zmiana 'ibid.' na 'Ibidem'
+\DefineBibliographyStrings{english}{
+    ibidem = {\textit{Ibidem}},
+}
+
+% Rzymska numeracja dla rozdziałów i arabska dla podrozdziałów
+%\renewcommand{\thesection}{\Roman{section}}
+%\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+
+% Format Rozdziałów i podrozdziałów
+%\titleformat{\section}[display]{\bfseries\centering}{ROZDZIAŁ \thesection}{5pt}{\centering #1}
+
+% stary format dla powyzszego
+%\titleformat{\section}[display]{\bfseries\centering}{ROZDZIAŁ \thesection}{5pt}{#1\quad}
+
+%\titleformat{\subsection}[hang]{\bfseries}{\thesubsection.}{5pt}{#1\quad}
+
+% Kropka po tytule sekcji
+\titlelabel{\thetitle.\quad}
+
+% Tytuł 'Bibliografia' wyrównana do lewej strony
+\defbibheading{bibliography}[\bibname]{
+    \chapter{\raggedleft \textbf{#1}}
+    \markboth{#1}{#1}
+}
+
+% Potrzebne do zmiany formatu nazw rysunków i wykresów
+%\usepackage[figurename=Rys.]{caption}
+%\renewcommand{\figurename}{Rys.}
+\captionsetup{labelsep=period}
+
+
+

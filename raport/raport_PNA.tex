@@ -1,0 +1,85 @@
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage[backend=biber,
+            %dashed=false, % usunąć linię przy tym samym autorze
+            %style=authoryear-icomp, % jeden styl do cytacji i bibliografii
+            citestyle=authoryear-icomp,
+            bibstyle=authortitle-icomp,
+            maxcitenames=3,
+            uniquelist=false, %jeśli ten sam pierwszy autor to nie wymienia drugiego innego
+            maxbibnames=100,
+            sorting=nyt,
+            hyperref=true,
+            uniquename=false, % żeby nie drukowało inicjałów dla pracy z tymi samymi nazwiskami
+            giveninits=true]{biblatex}
+%\usepackage{lmodern} % jeśli kompilowane na windows
+%\usepackage[polish]{babel}
+%\usepackage[none]{hyphenat} % usunięcie myślników w biblografii
+\usepackage[hidelinks]{hyperref} % do klikalnych linkow
+\usepackage{geometry} % do formatowania tekstu
+\usepackage{setspace} % dla odstępu pomiędzy liniami tekstu
+\usepackage[compact,explicit]{titlesec} % dla titleformat
+\usepackage{indentfirst} % wcięcie w pierwszym akapicie
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb}
+\usepackage[figurename=Rys.,singlelinecheck = false, justification = justified, format = hang]{caption} % format tytułów tabel/rysunkow/wykresow
+
+\addbibresource{bibliografia_pna.bib}
+
+\input{inputfiles/formatowanie}
+\input{inputfiles/options}
+
+\begin{document}
+
+\input{inputfiles/strona_tytulowa}
+\input{inputfiles/streszczenie}
+
+\tableofcontents
+\newpage
+
+% Odstęp pomiędzy wierszami wewnątrz akapitu
+\spacing{1.5}
+
+\section{Wstęp}
+We wstępie należy opisać problem/zagadnienie. Przedstawić hipotezy badawcze. Uzasadnić hipotezy badawcze. Napisać dlaczego temat jest ważny, dlaczego warto się nim zajmować, komu wnioski mogą być przydatne. We wstępie można przedstawić metody i wnioski z literatury.
+
+\section{Dane}
+W części poświęconej danym proszę opisać dane, napisać skąd pochodzą oraz jakim, jeśli jakimś, przekształceniom zostały poddane. Jeśli usunęliście Państwo jakieś obserwacje, to także proszę o tym napisać. Wykres danych, histogram lub jakaś forma wizualizacji danych może być pomocna dla czytelnika Państwa pracy do zrozumienia problemu lub hipotezy.
+
+\section{Model}
+Proszę opisać model lub metodę, której Państwo używacie w zrozumiały sposób, także dla osoby, która nie zna metody która Państwo się posługujecie. Idealnie byłoby, gdybyście Państwo tak opisali swoją metodę, aby każdy kto chciałby powtórzyć Państwa badanie nie miał z tym problemów. Proszę uzasadnić wybór metody. Proszę napisać jakie są potencjalne lub rzeczywiste wady i zalety metody.
+
+\section{Wyniki}
+W rozdziale wyniki proszę zweryfikować hipotezy badawcze. Podać prawdopodobne uzasadnienie w przypadku odrzucenia badanych hipotez.
+
+\section{Wnioski}
+Rozdział „wnioski” powinien zawierać powtórzenie najważniejszych wniosków oraz wskazanie kierunków dalszych prac nad tym tematem.
+
+\newpage
+
+% to tutaj potrzebne aby na końcu było bez 'i' pomiędzy autorami
+%\renewcommand*{\finalnamedelim}{\addcomma\addspace}
+
+% Zmiana nazwy bibliografii z 'References' na 'Bibliografia'
+\printbibliography[title ={BIBLIOGRAFIA}]
+
+\newpage
+
+\listoftables
+\addcontentsline{toc}{section}{Spis tabel}
+
+\listoffigures
+\addcontentsline{toc}{section}{Spis rysunków}
+
+\newpage
+
+\subsection*{Aneks}
+\addcontentsline{toc}{section}{Aneks}
+W aneksie powinien znaleźć się czytelnie przedstawiony kod z komentarzami.
+
+
+\newpage
+
+\end{document}
+
