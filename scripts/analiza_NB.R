@@ -5,11 +5,12 @@ library(rgl)
 
 source("./functions/funkcje_pomocnicze.R")
 
-policja <- read.csv(file = "./data/policja.csv", sep = ";") %>% 
+policja <- read.csv(file = "./data/policja.csv", sep = ";", encoding = "UTF-") %>% 
     select("Data","Wypadki.drogowe") %>%
     rename(date = Data,
            wypadki = Wypadki.drogowe ) %>%
-    mutate_at("date", as.Date, format = "%Y-%m-%d")
+    mutate_at("date", as.Date, format = "%Y-%m-%d") %>% 
+    arrange(date)
 
 x = policja$wypadki
 
@@ -23,12 +24,12 @@ x = round(x)
 N = length(x)
 
 #### Szacowanie metodą największej wiarygodności ####
-lnL_NB <- function(parametry) {
-    r = parametry[1]
-    p = parametry[2]
-    ll = sum(log(gamma(x + r))) + sum(log_sum(x)) - N * log(gamma(r)) + 
-        sum(x) * log(1 - p) + N * r * log(p)
-}
+# lnL_NB <- function(parametry) {
+#     r = parametry[1]
+#     p = parametry[2]
+#     ll = sum(log(gamma(x + r))) + sum(log_sum(x)) - N * log(gamma(r)) + 
+#         sum(x) * log(1 - p) + N * r * log(p)
+# }
 
 lnL_NB <- function(parametry) {
     r = parametry[1]
@@ -67,14 +68,47 @@ summary(wynik)
 wynik = maxNR(lnL_NB, grad = gradient, hess = hessian, start = c(0.5,0.5))
 summary(wynik)
 
-# sprawdzic w help maxNR "tolerancja"
+# po ograniczeniu (ponieważ na tym okresie mniejsze wartości) nadal błąd
+
+
+
+
+
+
+
+
+
+
+
 
 #### Testowanie hipotez (MNW) ####
 
-# po ograniczeniu (ponieważ na tym okresie mniejsze wartości) nadal błąd
-ggplot(data = policja) +
-    geom_point(aes(y = wypadki, x = date), size = 0.3)
+# Hipoteza złożona:
+# H0: r = 10 & p = 0.1
 
-wynik = maxNR(lnL3, start = c(0.5,0.5))
-summary(wynik)
+g = 2           # ilość parametrów na których testujemy hipotezy
+alpha = 0.05    # przyjmuje poziom istotności równy 0.05
+
+(lnL_U = wynik$maximum)
+(lnL_R = lnL_NB(c(10, 0.1)))
+
+# Statystyka testowa:
+(LR_test  = lnL_U - lnL_R)
+
+# Obszar krytyczny H0:
+qchisq(1 - alpha, df = g)
+
+# p-value:
+p_val = (1 - pchisq(q = LR_test, df = g))
+
+# Wniosek:
+
+
+
+
+
+
+
+
+
 
