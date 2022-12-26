@@ -31,6 +31,7 @@ N = length(x)
 #         sum(x) * log(1 - p) + N * r * log(p)
 # }
 
+
 lnL_NB <- function(parametry) {
     r = parametry[1]
     p = parametry[2]
@@ -71,15 +72,39 @@ summary(wynik)
 # po ograniczeniu (ponieważ na tym okresie mniejsze wartości) nadal błąd
 
 
+#### Rysowanie płaszczyzny funkcji wiarygodności ####
 
+# funkcja z elementem sum(log(factorial(x)))
+f <- function(r, p) {
+    ll = sum(log(gamma(x + r))) + sum(log(factorial(x))) - N * log(gamma(r)) + 
+        sum(x) * log(1 - p) + N * r * log(p)
+    return(ll)
+}
 
+# funkcja bez elementu sum(log(factorial(x)))
+f <- function(r, p) {
+    ll = sum(log(gamma(x + r))) - N * log(gamma(r)) + 
+        sum(x) * log(1 - p) + N * r * log(p)
+    return(ll)
+}
 
+siatka_r = seq(from = 1, to = 300, by = 1)
+siatka_p = seq(from = 0.01, to = 0.99, by = 0.01)
 
+value = matrix(0,
+               nrow = length(siatka_r),
+               ncol = length(siatka_p))
 
+for (i in 1:length(siatka_r)) {
+    for (j in 1:length(siatka_p)) {
+        value[i, j] = f(siatka_r[i], siatka_p[j])
+    }
+}
 
-
-
-
+persp3d(siatka_r, siatka_p, value, col = "blue")
+image(siatka_r, siatka_p, value)
+persp3d(siatka_r, siatka_p, exp(value), col = "blue")
+image(siatka_r, siatka_p, exp(value))
 
 #### Testowanie hipotez (MNW) ####
 
