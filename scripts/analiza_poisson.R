@@ -2,6 +2,7 @@
 library(maxLik)
 library(tidyverse)
 library(rgl)
+options(scipen = 99)
 
 source("./functions/funkcje_pomocnicze.R")
 
@@ -30,14 +31,14 @@ hessian = function(lambda) {
 }
 
 # Wynik bez gradientu i hesjanu
-wynik1 = maxNR(lnL_poiss, start = 80)
-summary(wynik1)
+pois_wynik1 = maxNR(lnL_poiss, start = 80)
+summary(pois_wynik1)
 
 # Wynik z gradientem i hesjanem
-wynik2 = maxNR(fn = lnL_poiss,
+pois_wynik2 = maxNR(fn = lnL_poiss,
               grad = gradient,
               hess = hessian, start = 80)
-summary(wynik2)
+summary(pois_wynik2)
 
 curve(lnL_poiss, 0 , 200, col = "black")
 curve(lnL_poiss, 82.55 , 82.65, col = "black")
@@ -48,7 +49,7 @@ abline(v = 82.60278, col= "green") # z gradientem i hesjanem
 
 # Hipoteza prosta:
 
-(vcov = -solve(wynik2$hessian))
+(vcov = -solve(pois_wynik2$hessian))
 (std_err_lambda = sqrt(vcov))
 
 # hipoteza odnośnie parametru lambda:
@@ -57,7 +58,7 @@ abline(v = 82.60278, col= "green") # z gradientem i hesjanem
 hipoteza = 10
 
 # Statystyka testowa:
-(z_test = (wynik$estimate - 82.606) / std_err_lambda)
+(z_test = (pois_wynik2$estimate - 82.606) / std_err_lambda)
 
 # p-value:
 (p_val = 2 * (1 - pnorm(q = abs(z_test))))

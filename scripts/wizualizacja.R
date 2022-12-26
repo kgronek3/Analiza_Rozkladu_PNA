@@ -1,3 +1,5 @@
+#### Plik z wczytywaniem danych i wizualizacją ####
+
 library(xts)
 library(quantmod)
 library(tidyverse)
@@ -5,14 +7,36 @@ library(forecast) # seasonplot()
 library(ggplot2)
 library(dplyr)
 library(scales) # for percent in labes
+
+library(maxlik)
+library(rgl)
+library(rootsolve)
  
 # XTS visualisation
-policja <- read.csv(file = "./data/policja.csv", sep = ";")
-policja <- xts(policja[, -1],
-               as.Date(policja$Data,
-                        format = "%Y-%m-%d"))
+policja  <- read.csv(file = "./data/policja.csv", sep = ";", encoding = "UTF-8") %>% 
+    select("Data","Wypadki.drogowe") %>%
+    rename(date = Data,
+           wypadki = Wypadki.drogowe ) %>%
+    mutate_at("date", as.Date, format = "%Y-%m-%d") %>% 
+    arrange(date)
 
-plot(policja[,5],
+policja <- policja %>% 
+    mutate(przed_pandemia = if_else(date < "2020-01-01", 
+                                    wypadki, NULL),
+           po_pandemii = if_else(date >= "2020-01-01",
+                                 wypadki, NULL))
+
+
+wypadki.xts <- xts(policja[,-1],
+             order.by = policja[,"date"])
+colnames(wypadki.xts) <- "Wypadki drogowe w Polsce"
+
+wypadki.ts <- ts(policja[,2], frequency = 365,
+                 end = c(2022, 10),
+                 start = c(2008, 12)) 
+
+
+plot(wypadki.xts[,c("przed_pandemia","po_pandemii")],
      main = "Wypadki drogowe w Polsce",
      # defining several colors - one for each series
      col = c("red", "darkgreen", "darkblue", "brown","black"),
@@ -23,10 +47,31 @@ plot(policja[,5],
      legend.loc = "topright",
      cex = 1)
 
+# Przed wybuchem pandemii koronawirusa
+plot(wypadki.xts["2008-01-01/2020-01-01",c(-2,-3)],
+     main = "Wypadki drogowe w Polsce - przed wybuchem pandemii",
+     # defining several colors - one for each series
+     col = c("red", "darkgreen", "darkblue", "brown","black"),
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     # location of a legend - useful for several series
+     legend.loc = "topright",
+     cex = 1)
 
-wypadki <- ts(policja[,5], frequency = 365, start = c(2008, 12)) 
+# Po pandemii koronawirusa
+plot(wypadki.xts["2020-01-01/"],
+     main = "Wypadki drogowe w Polsce - po wybuchu pandemii",
+     # defining several colors - one for each series
+     col = c("red", "darkgreen", "darkblue", "brown","black"),
+     major.ticks = "years", 
+     grid.ticks.on = "years",
+     grid.ticks.lty = 3,
+     # location of a legend - useful for several series
+     legend.loc = "topright",
+     cex = 1)
 
-ggseasonplot(wypadki)
+ggseasonplot(wypadki.ts)
 
 summary(wypadki)
 
@@ -41,8 +86,11 @@ policja <- read.csv(file = "./data/policja.csv", sep = ";") %>%
     select("Data","Wypadki.drogowe") %>%
     rename(date = Data,
            wypadki = Wypadki.drogowe ) %>%
-    mutate_at("date", as.Date, format = "%Y-%m-%d")
-
+    mutate_at("date", as.Date, format = "%Y-%m-%d") %>% 
+    arrange(date)
+head(policja)
+tail(policja)
+        
 swieta <- read.csv(file = "./data/swieta.csv", sep = ";") %>% 
     mutate_at("date", as.Date, format = "%Y-%m-%d")
 
@@ -50,16 +98,6 @@ policja <- policja %>% mutate(czy_swieto = case_when(policja$date %in% swieta$da
                                                  !(policja$date %in% swieta$date) ~ FALSE))
 
 # tutaj wstawić łączenie z danymi odnośnie świąt
-policja <- policja %>% 
-    mutate(swieto = case_when(date >= 1930 & date < 1940 ~ "1930's",
-                              date >= 1940 & date < 1950 ~ "1940's",
-                              date >= 1950 & date < 1960 ~ "1950's",
-                              date >= 1960 & date < 1970 ~ "1960's",
-                              date >= 1970 & date < 1980 ~ "1970's",
-                              date >= 1980 & date < 1990 ~ "1980's",
-                              date >= 1990 & date < 2000 ~ "1990's",
-                              date >= 2000 & date < 2010 ~ "2000's"))
-
 
 format(policja$date[2], format = "%m-%d") == "10-15"
 
@@ -68,6 +106,12 @@ tail(policja)
 
 ggplot(data = policja) +
     geom_point(aes(y = wypadki, x = date, color = czy_swieto), size = 0.3)
+
+ggplot(data = policja, aes(x = wypadki)) +
+    geom_bar(stat = "count", aes(y = ..count..))
+
+policja$wypadki = policja$wypadki/10
+
     
 ggplot(data = policja, aes(x = wypadki)) +
     geom_bar(stat = "count", aes(y = ..prop..)) +
